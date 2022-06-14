@@ -1,0 +1,200 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>MAP</title>
+    <style>
+        .header {
+            display: block;
+            width: 40px;
+            height: 40px;
+            background-color: blueviolet;
+        }
+
+        .map {
+            display: block;
+            border: 1px solid blue;
+            position: absolute;
+            margin-top: 0px;
+            width: 342px;
+            height: 342px;
+            margin: 0px auto;
+            background: url('image/map.png');
+            background-size: cover;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<input type="text" id="url" value="127.0.0.1" style="width:200px;">
+<button onclick="WebSocketRun('ws://' + document.getElementById('url').value+':9091')">连接</button>
+<button id="float" style="visibility: hidden" onclick="setFloat(this)">显示悬浮窗</button>
+<div class="map">
+    <canvas class="map" id="myCanvas" width="342" height="342" style="border:1px solid #c3c3c3;">
+        您的浏览器不支持
+    </canvas>
+</div>
+</body>
+<script type="text/javascript">
+    var headers = [];
+    var images = [];
+    var myCanvas = document.getElementById("myCanvas");
+    var ws;
+    var isVis = false;
+
+    function setFloat(v) {
+        // var float = document.getElementById("float");
+        if (isVis === true) {
+            v.textContent = "显示悬浮窗";
+            if (ws != null) {
+                ws.send("bfloat");
+            }
+            isVis = false;
+        } else {
+            v.textContent = "隐藏悬浮窗";
+            if (ws != null) {
+                ws.send("vfloat");
+            }
+            isVis = true;
+        }
+
+    }
+
+    function drawRoundRect(cxt, x, y, width, height, radius, lineWidth, color, isfill) {
+        if (2 * radius > width || 2 * radius > height) {
+            return false;
+        }
+        cxt.save();
+        cxt.translate(x, y);
+        drawRoundRectPath(cxt, width, height, radius);
+        cxt.lineWidth = lineWidth || 2;
+        if (isfill) {
+            cxt.fillStyle = color || "#000";
+            cxt.fill();
+        } else {
+            cxt.strokeStyle = color || "#000";
+            cxt.stroke();
+        }
+        cxt.restore();
+    }
+
+    function drawImage(cxt, img, x, y, w, h) {
+        cxt.drawImage(img, x, y, w, h);
+    }
+
+    function drawCircle(cxt, x, y, redius, lineWidth, color, isfill) {
+        cxt.beginPath(0);
+        cxt.lineWidth = lineWidth;
+        cxt.arc(x, y, redius, 0, 2 * Math.PI, false);
+        if (isfill) {
+            cxt.fillStyle = color;
+            cxt.fill();
+        } else {
+            cxt.strokeStyle = color;
+            cxt.stroke();
+        }
+
+    }
+
+    function drawRoundRectPath(cxt, width, height, radius) {
+        cxt.beginPath(0);
+        cxt.arc(width - radius, height - radius, radius, 0, Math.PI / 2);
+        cxt.lineTo(radius, height);
+        cxt.arc(radius, height - radius, radius, Math.PI / 2, Math.PI);
+        cxt.lineTo(0, radius);
+        cxt.arc(radius, radius, radius, Math.PI, Math.PI * 3 / 2);
+        cxt.lineTo(width - radius, 0);
+        cxt.arc(width - radius, radius, radius, Math.PI * 3 / 2, Math.PI * 2);
+        cxt.lineTo(width, height - radius);
+        cxt.closePath();
+    }
+
+    function clearCanvas() {
+        var cxt = document.getElementById("myCanvas")
+        var c = cxt.getContext("2d");
+        c.clearRect(0, 0, cxt.width, cxt.height);
+    }
+
+    function WebSocketRun(url) {
+        if ("WebSocket" in window) {
+            var float = document.getElementById("float");
+            float.style.visibility = "visible";
+            ws = new WebSocket(url);
+            ws.onopen = function () {
+                ws.send("ok");
+            };
+            ws.onmessage = function (ev) {
+                const data = JSON.parse(ev.data);
+                const buff = data.buff;
+                const listData = data.listData;
+
+                clearCanvas();
+                if (data.cmd === -1) {
+                    headers.length = 0;
+                    images.length = 0;
+                    return;
+                } else if (data.cmd === -2) {
+                    alert(data.messge);
+                }
+
+                for (var i = 0; i < listData.length; i++) {
+                    var hero = listData[i];
+                    if (hero.hp <= 0) {
+                        continue;
+                    }
+                    let isLocal = false;
+                    let pos = 0;
+                    let img;
+                    if (headers.length > 0) {
+                        for (var j = 0; j < headers.length; j++) {
+                            if (headers[j] === hero.id) {
+                                isLocal = true;
+                                pos = j;
+                            }
+                        }
+                    }
+                    if (!isLocal) {
+                        img = new Image();
+                        img.src = "image/" + hero.id + ".png";
+                        headers.push(hero.id);
+                        images.push(img);
+                    } else {
+                        img = images[pos];
+                    }
+                    const hdSize = 35;
+                    const context = myCanvas.getContext('2d');
+                    drawImage(context, img, hero.x, hero.y, hdSize, hdSize);
+                    var hcolor = "#f00";
+                    if (hero.cmap === 1) {
+                        hcolor = "#00f7ff";
+                    }
+                    drawCircle(context, hero.x + hdSize / 2, hero.y + hdSize / 2, hdSize / 2, 3, hcolor, false);
+                    drawRoundRect(context, hero.x, hero.y + hdSize - 4, hdSize, 5, 2, 2, '#000', true);
+                    drawRoundRect(context, hero.x, hero.y + hdSize - 4, hdSize / 50 * hero.hp, 5, 2, 2, '#FF8A80FF', true);
+                }
+                var buffxd = myCanvas.getContext('2d');
+
+                buffxd.font = 'bold 16px Arial';
+                buffxd.textAlign = 'center';
+                buffxd.textBaseline = 'bottom';
+                buffxd.fillStyle = '#ff0';
+
+                if (buff.bbTime > 0) buffxd.fillText("" + buff.bbTime, 90, 170);
+                if (buff.brTime > 0) buffxd.fillText("" + buff.brTime, 170, 290);
+                if (buff.rbTime > 0) buffxd.fillText("" + buff.rbTime, 260, 190);
+                if (buff.rrTime > 0) buffxd.fillText("" + buff.rrTime, 170, 70);
+            };
+            ws.onclose = function () {
+                alert("服务已被关闭");
+            };
+        } else {
+            alert("您的浏览器不支持此功能!");
+        }
+    }
+
+</script>
+</html>
+
