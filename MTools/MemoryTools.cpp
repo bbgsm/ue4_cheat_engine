@@ -73,10 +73,11 @@ void MemoryTools::log(const char *str) {
 int MemoryTools::pr(void *buff, size_t len, Addr addr, int offset) {
     memset(buff, 0, len);
     Addr lastAddr = addr + offset;
-    if (MemoryTools::isMemoryTrap(lastAddr)) {
-        //printf("缺页内存:%lX\n", lastAddr);
-        return 0;
-    }
+    // 缺页/陷阱 内存过滤（需要过滤就打开）
+//    if (MemoryTools::isMemoryTrap(lastAddr)) {
+//        //printf("缺页内存:%lX\n", lastAddr);
+//        return 0;
+//    }
 #if READ_TYPE == 0
     iovec iov_ReadBuffer{}, iov_ReadOffset{};
     iov_ReadBuffer.iov_base = buff;
@@ -93,9 +94,10 @@ int MemoryTools::pr(void *buff, size_t len, Addr addr, int offset) {
 
 int MemoryTools::pw(void *buff, int len, ulong addr, off_t offset) {
     Addr lastAddr = addr + offset;
-    if (MemoryTools::isMemoryTrap(lastAddr)) {
-        return 0;
-    }
+    // 缺页/陷阱 内存过滤（需要过滤就打开）
+//    if (MemoryTools::isMemoryTrap(lastAddr)) {
+//        return 0;
+//    }
 #if READ_TYPE == 0
     iovec iov_WriteBuffer{}, iov_WriteOffset{};
     iov_WriteBuffer.iov_base = buff;

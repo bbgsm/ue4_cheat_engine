@@ -2,7 +2,8 @@
 
 安卓UE4 FPS游戏测试读取数据/测试作弊
 有自瞄以及数据读取测试
-
+# 效果
+  ![效果](img/game_demo.jpg "效果")
 # 编译
 
 - 直接编译
@@ -23,6 +24,11 @@
   ```
 
   ![cmake optinos](img/cmake_optinos.png "cmake optinos")
+# 鸣谢 
+- [c++绘制 Android_Native_Surface](https://github.com/SsageParuders/Android_Native_Surface)
+- [libhv工具库 libhv](https://github.com/ithewei/libhv)
+- [lua库 lua](https://github.com/LuaDist/lua)
+
 
 # 提示
 

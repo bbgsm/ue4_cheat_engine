@@ -34,8 +34,8 @@ int main() {
 
 
     float matrix[16] = {0}; // 矩阵数据
-    float px = 1200 - (60 / 2);
-    float py = 640;
+    float px = displayInfo.width / 2;
+    float py = displayInfo.height / 2;
     bool flag = BaseAddr > 0;
     while (flag) {
         Addr ActorArray = memTools->readAddr(uleve, 0xA0);
@@ -54,7 +54,7 @@ int main() {
             // ue4 4.23 读取物品名称
             gameTools->getObjName4_23(oid, Gname, 0x20, name);
             memcpy(name, name + 2, 30);
-            sprintf(buff, "%d %s", oid,name);
+            sprintf(buff, "%d %s", oid, name);
             C3D ObjCoor{};
             memTools->readV(&ObjCoor, 0xC, ActorPosition, 0x1E0);
 
@@ -64,8 +64,8 @@ int main() {
                 continue;
             }
 
-            float fx = 60;
-            float fy = -60;
+            float fx = 0;
+            float fy = 0;
 
             ImDrawList *draw = ImGui::GetForegroundDrawList();
             draw->AddText(ImVec2(o2d.x - o2d.w / 2, o2d.y - o2d.h), IM_COL32(255, 0, 0, 255),
