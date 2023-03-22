@@ -1,5 +1,6 @@
 #include "Type.h"
 #include <list>
+#include <cstdio>
 
 using namespace std;
 
@@ -38,6 +39,7 @@ private:
     int DSize = sizeof(double);
     int BSize = sizeof(mbyte);
     int ULSize = sizeof(ulong);
+    int I16LSize = sizeof(int16);
 
     FILE *pagemap_fd = nullptr;
     int pagemap_pfd;
@@ -120,6 +122,7 @@ public:
     Addr readSafeAddr(Addr addr, int offset = 0);    //保护读取addr内存,如果缺页直接返回0 需要先执行初始化initPageMap()方法,
 
     int readI(Addr addr, int offset = 0);       //读取int
+    int16 readI16(Addr addr, int offset = 0);     //读取int16
     bool readZ(Addr addr, int offset = 0);       //读取int
     ulong readUL(Addr addr, int offset = 0);     //读取ulong
     Addr readAddr(Addr addr, int offset = 0);    //读取ulong
@@ -180,7 +183,7 @@ public:
 
     list<RADDR> *getResults();                 // 获取结果,返回头指针
     list<RADDR> *getMapResults();              // 获取搜map结果
-    int getProcessPid() const;                // 获取已设置的进程pid
+    int getPid() const;                // 获取已设置的进程pid
     int getResCount();                  // 获取搜索的数量
 
     bool isMemoryTrap(Addr address) const;    //判断内存是否缺页

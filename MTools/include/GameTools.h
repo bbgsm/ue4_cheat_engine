@@ -111,6 +111,7 @@ public:
     void getObjName(int id, Addr Gname,int len , char *buffer);
 
 
+    void getObjName4_23(int id, Addr Gname, int len, char *buffer);
 };
 
 

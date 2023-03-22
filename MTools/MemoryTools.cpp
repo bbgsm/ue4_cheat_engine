@@ -640,6 +640,12 @@ int MemoryTools::readI(Addr addr, int offset) {
     return temp;
 }
 
+int16 MemoryTools::readI16(Addr addr, int offset) {
+    int16 temp = 0;
+    pr(&temp, I16LSize, addr, offset);
+    return temp;
+}
+
 bool MemoryTools::readZ(Addr addr, int offset) {
     return readI(addr, offset) > 0;
 }
@@ -651,7 +657,7 @@ ulong MemoryTools::readUL(Addr addr, int offset) {
 }
 
 Addr MemoryTools::readAddr(Addr addr, int offset) {
-    return readUL(addr, offset);
+    return readUL(addr, offset) & 0xFFFFFFFFFF;
 }
 
 Addr MemoryTools::readSafeAddr(Addr addr, int offset) {
@@ -1261,7 +1267,7 @@ list<RADDR> *MemoryTools::getMapResults()                // 获取搜map结果
     return MapList;
 }
 
-int MemoryTools::getProcessPid() const {
+int MemoryTools::getPid() const {
     return GAME_PID;
 }
 

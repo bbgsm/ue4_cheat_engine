@@ -15,6 +15,7 @@ typedef unsigned int CharType;
 typedef unsigned char UTF8;
 typedef unsigned short UTF16;
 typedef unsigned int UTF32;
+typedef signed short int int16;
 
 // 3D结构体
 struct C3D {

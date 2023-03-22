@@ -1,4 +1,5 @@
 
+#include <cstring>
 #include "GameTools.h"
 #include "MemoryTools.h"
 #include "abiUtil.h"
@@ -193,6 +194,11 @@ void GameTools::ReadFTransform1(FTransform &transform, Addr location) {
     transform.Scale3D.Z = m_MemTools->readF(location + 40);
 }
 
+/**
+ * 读取玩家骨骼信息
+ * @param h3D 接收的骨骼3d信息
+ * @param Mesh_Offset Mesh偏移
+ */
 void GameTools::Get_Hero_Bone_3D(Bone3D &h3D, Addr Mesh_Offset) {
 
 //    Addr Bone_Offset = Mesh_Offset + 0x6E0;
@@ -216,6 +222,14 @@ void GameTools::Get_Hero_Bone_3D(Bone3D &h3D, Addr Mesh_Offset) {
     Get_Bone_3D(h3D.Rankle, Bone_Offset, Actor, 58);
 }
 
+/**
+ * 骨骼3d坐标转屏幕坐标
+ * @param h3D  3d坐标
+ * @param hero2D 接收的屏幕坐标
+ * @param matrix 矩阵
+ * @param px 屏幕宽 / 2
+ * @param py 屏幕高 / 2
+ */
 void GameTools::getBone3Dto2D(Bone3D &h3D, Bone2D &hero2D, float *matrix, int px, int py) {
     getBone3Dto2D(hero2D.Head, matrix, px, py, h3D.Head);
     getBone3Dto2D(hero2D.Pit, matrix, px, py, h3D.Pit);
@@ -234,13 +248,37 @@ void GameTools::getBone3Dto2D(Bone3D &h3D, Bone2D &hero2D, float *matrix, int px
     getBone3Dto2D(hero2D.Rankle, matrix, px, py, h3D.Rankle);
 }
 
+/**
+ * UE4 4.23读取对象名称
+ */
 void GameTools::getObjName(int id, Addr Gname, int len, char *buffer) {
     if (id > 0 && id < 2000000) {
-        int ye = id / 16384;
-        int xu = id % 16384;
-        Addr ddz = m_MemTools->readAddr(Gname + ye * sizeof(Addr));
-        Addr namedz = m_MemTools->readAddr(ddz + xu * sizeof(Addr));
-        m_MemTools->readV(buffer, len, namedz, 0x4 + sizeof(Addr));
+        // 块
+        int block = id / 16384;
+        // 偏移
+        int offset = id % 16384;
+        Addr namePoolChunk = m_MemTools->readAddr(Gname + block * sizeof(Addr));
+        Addr fNameEntry = m_MemTools->readAddr(namePoolChunk + offset * sizeof(Addr));
+        m_MemTools->readV(buffer, len, fNameEntry, 0x10 + sizeof(Addr));
+    }
+}
+
+/**
+ * UE4 4.23读取对象名称
+ */
+void GameTools::getObjName4_23(int id, Addr Gname, int len, char *buffer) {
+    if (id > 0 && id < 2000000) {
+        // 块
+        int block = id >> 16;
+        // 偏移
+        int offset = id & 65535;
+        Addr namePoolChunk = m_MemTools->readAddr(Gname + abiUtil::abi(0xC, 0x10) + block * sizeof(Addr));
+        Addr fNameEntry = namePoolChunk + (2 * offset);
+        int16 fNameEntryHeader = m_MemTools->readI16(fNameEntry);
+        int strLength = fNameEntryHeader >> 6;
+        if (strLength > 0 && strLength < 250) {
+            m_MemTools->readV(buffer, strLength, fNameEntry);
+        }
     }
 }
 

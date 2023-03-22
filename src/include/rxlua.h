@@ -108,14 +108,14 @@ int initToolsPm(lua_State *L) {
     string pm = luaL_checkstring(L, 1);
     memoryTools = MemoryTools::MakePm(pm.c_str());
     memoryTools->initPageMap();
-    lua_pushnumber(L, memoryTools->getProcessPid());
+    lua_pushnumber(L, memoryTools->getPid());
     return 1;
 }
 
 int initToolsSelf(lua_State *L) {
     delete memoryTools;
     memoryTools = MemoryTools::MakeSELF();
-    lua_pushnumber(L, memoryTools->getProcessPid());
+    lua_pushnumber(L, memoryTools->getPid());
     return 1;
 }
 int readL(lua_State *L) {

@@ -1,3 +1,7 @@
+/**
+ * moba手游读取
+ */
+
 #include <thread>
 #include <cstdlib>
 #include <unistd.h>

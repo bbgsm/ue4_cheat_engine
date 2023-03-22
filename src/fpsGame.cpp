@@ -1,10 +1,13 @@
-#include "fpsGame.h"
+/**
+ * ue4 fps手游读取
+ */
 
+#include "fpsGame.h"
 #include "fpsGamePublic.h"
 #include "TimeTools.h"
 #include "SocketTools.h"
 #include "GnameUtils.h"
-#include "touch.h"
+#include "virtualTouch.h"
 #include "requests.h"
 #include "hmutex.h"
 #include "abiUtil.h"
@@ -80,7 +83,7 @@ void Engine::call(int status) {
 void *Engine::start(void *v) {
     auto *engine = (Engine *) v;
     engine->memTools = MemoryTools::MakePm("com.**.**");
-    if (engine->memTools->getProcessPid() <= 0) {
+    if (engine->memTools->getPid() <= 0) {
         engine->socTools->sendCMD(D_MESSGE, "游戏未运行"); //发送进程不存在指令给app
         addLog("Game not runing");
         engine->call(SOC_ALL_CLOSE);

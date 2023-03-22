@@ -5,41 +5,33 @@
 #include "GnameUtils.h"
 
 
-void mm() {
+int main() {
+    MemoryTools *memTools = MemoryTools::MakePm("com.ga.gg");
+    memTools->initPageMap();
+    memTools->setSearchRange(MemoryTools::C_ALLOC);
+
+    Addr BaseAddr = memTools->BaseAddr("libUE4.so");
+    printf("BaseAddr: %lx\n", BaseAddr);
+    printf("Gname: %lx\n", (BaseAddr + 0xA40FF80));
+    printf("GWorld: %lx\n", BaseAddr + 0x0A5707B0);
 
 
+    printf("pid:%d\n", memTools->getPid());
+    int c = memTools->MemorySearch("117637123", MemoryTools::MEM_DWORD);
+    printf("MemorySearch:%d\n", c);
+    c = memTools->MemoryOffset("126780", 4, MemoryTools::MEM_DWORD);
+    printf("MemorySearch:%d\n", c);
 
-    GameTools *gameTools = new GameTools(memTools);
+//    c = memTools->MemoryOffset("-572662307", 8, MemoryTools::MEM_DWORD);
+//    printf("MemorySearch:%d\n", c);
 
+    //    c = memTools->MemoryOffset("15", 12, MemoryTools::MEM_DWORD);
+    //    printf("MemorySearch:%d\n", c);
 
-   MemoryTools *memTools = MemoryTools::MakePm("");
-
-     memTools->MemorySearch("1065353216",  DWORD);
-     memTools->MemoryOffset("1065353216", 4,  DWORD);
-     memTools->MemoryOffset("1065353216", 8,  DWORD);
-     memTools->MemoryOffset("1065353216", 12,  DWORD);
-     memTools->MemoryOffset("0", 16,  DWORD);
-     memTools->MemoryOffset("1065353216", 24,  DWORD);
-     memTools->MemoryOffset("0", 28,  DWORD);
-     memTools->MemoryOffset("0", 32,  DWORD);
-     memTools->MemoryOffset("1065353216", 36,  DWORD);
-     memTools->MemoryOffset("3", 264,  FLOAT);
-
-   for (list<RADDR>::iterator pmapsit = memTools->getResults()->begin(); pmapsit != memTools->getResults()->end(); ++pmapsit) {
-         printf("addr:%lX\n", pmapsit->addr);
+    for (list<RADDR>::iterator pmapsit = memTools->getResults()->begin();
+         pmapsit != memTools->getResults()->end(); ++pmapsit) {
+        printf("addr:%lX\n", pmapsit->addr);
     }
-
-//=================================
-
-    Addr baseAddr = memTools->BaseAddr("");
-    Addr coorBase = baseAddr + 0x75A72A4;
-    Addr UWorld = memTools->readUL(coorBase);
-    Addr Gname = memTools->readUL(baseAddr + 0x73C6094);//Gname
-
-    printf("UWorld:%X\n", UWorld);
-    printf("Gname:%X\n", Gname);
-
-
 
 
 }

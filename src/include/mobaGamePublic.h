@@ -352,7 +352,7 @@ public:
     bool initBase() {
         memTools = MemoryTools::MakePm("com.*****");
         //进程不存在
-        if (memTools->getProcessPid() <= 0) {
+        if (memTools->getPid() <= 0) {
             return false;
         }
         memTools->initPageMap();
