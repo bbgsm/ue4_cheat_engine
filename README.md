@@ -8,7 +8,7 @@
 - 直接编译
   1. 下载ndk20版本并在build/build.bat中设置ndk路径，执行build.bat进行编译
 - Clion工具编译
-  1. 需要将一下参数复制到cmake optinos中
+  1. 需要将以下参数复制到cmake optinos中
 
   ```
 
